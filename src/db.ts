@@ -26,7 +26,7 @@ export default class DbManager {
   public async createUser(email: string): Promise<any> {
     return await this.db.put({
       _id: `user_${email}`,
-      accessKey: this.generateAccessKey(4),
+      accessKey: this.generateAccessKey(),
       type: TYPE_USER,
     });
   }
@@ -39,12 +39,18 @@ export default class DbManager {
    * @returns {Promise<any>}
    * @memberof DbManager
    */
-  public async getUser(email: string, accessKey: string): Promise<any> {
+  public async getUserSecure(email: string, accessKey: string): Promise<any> {
     const doc = await this.db.get(`user_${email}`) as any;
 
     if (doc.accessKey !== accessKey) {
       throw new Error("Invalid Access Key provided !");
     }
+
+    return doc;
+  }
+
+  public async getUserUnsecured(email: string): Promise<any> {
+    return await this.db.get(`user_${email}`) as any;
   }
 
   /**
@@ -57,12 +63,25 @@ export default class DbManager {
    * @memberof DbManager
    */
   public async patchUser(email: string, accessKey: string, data: object): Promise<any> {
-    const doc = await this.getUser(email, accessKey);
+    const doc = await this.getUserSecure(email, accessKey);
+    console.log(`=== PATCHING USER : ${email} ===`);
+    console.log(doc);
+    console.log("");
 
-    return await this.db.put(Object.assign(doc, data));
+    await this.db.put(Object.assign(doc, data));
+    console.log("Done");
+    return await this.getUserUnsecured(email);
   }
 
-  private generateAccessKey(len) {
+  /**
+   * Generate an random hex number.
+   *
+   * @private
+   * @param {any} len - The hash len
+   * @returns
+   * @memberof DbManager
+   */
+  private generateAccessKey(len = 5) {
     return crypto.randomBytes(Math.ceil(len / 2))
       .toString("hex") // convert to hexadecimal format
       .slice(0, len);   // return required number of characters
