@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import * as requestmodule from "request";
 
+// LEGACY CODE just in case we need it
 const countryInfo = (country, info, rq, rs) => {
     let speech = "Je ne trouve aucune information pour ce pays, désolé";
     let image = "";
@@ -55,9 +56,4 @@ const countryInfo = (country, info, rq, rs) => {
             console.log(e);
         }
     });
-};
-
-const getUserInfo = (email, rs) => {
-    const speech = `Bonjour`;
-    rs.send({ speech, displayText: speech });
 };
