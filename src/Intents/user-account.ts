@@ -17,6 +17,7 @@ export const checkAccessKey = async ({ email, accessKey }, dbManager: DbManager)
         const doc = await dbManager.getUserSecure(email, accessKey);
         console.log("Access key valid ! Continuing");
         return {
+            contextOut: [{ name: "User-Retrieved-Data", lifespan: 10, parameters: { doc } }],
             speech: `Merci ! Heureux de vous revoir ${doc.firstname}.
             Lors de notre dernière conversation vous m'avez dit vouloir voyager vers ${doc.destination}`,
         };
@@ -39,7 +40,8 @@ export const askPasswordRecovery = async (
         return { speech: "D'accord, à une prochaine fois alors." };
     }
 
-    const doc = await dbManager.getUserUnsecured(params.email);
+    const email = params.email;
+    const doc = await dbManager.getUserUnsecured(email);
 
     await mailer.sendMail({
         subject: "Votre récupération de mot de passe",
@@ -47,11 +49,11 @@ export const askPasswordRecovery = async (
         Bonjour ${doc.firstname},
         voici le code permettant d'accéder à notre discussion [${doc.accessKey}].
         À tout de suite !`,
-        to: params.email,
+        to: email,
     });
 
     return {
-        contextOut: [{ name: "MainContext", lifespan: 1 }],
+        contextOut: [{ name: "AskAccessKeyContext", lifespan: 2 }], // Display the waitpassword window and prompted.
         speech: "D'accord, je vais vous l'envoyer dans ce cas. Donnez le moi quand vous le recevrez",
     };
 };

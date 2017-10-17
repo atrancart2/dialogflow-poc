@@ -17,6 +17,7 @@ export const welcomeInit = async ({ email, firstname }, dbManager: DbManager): P
         console.log("User found !");
         console.log(doc);
         return {
+            contextOut: [{ name: "AskAccessKeyContext", lifespan: 1 }],
             followupEvent: {
                 data: { email },
                 name: "ask-access-key",
