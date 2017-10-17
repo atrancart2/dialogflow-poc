@@ -1,12 +1,11 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
-import { searchTrains } from "./api";
 import DbManager from "./db";
 import IChatResponse from "./IChatResponse";
 import Mailer from "./mailer";
 
 // Intents
-import { welcomeInit } from "./Intents/main";
+import { welcomeInit, searchTrainsAction } from "./Intents/main";
 import { askPasswordRecovery, checkAccessKey } from "./Intents/user-account";
 
 const app = express();
@@ -44,10 +43,8 @@ app.post("/", async (req, res, next) => {
         .then(updateRequest(req, next));
       break;
     case "search-trains":
-      searchTrains
-        .then(res => {
-
-        })
+      searchTrainsAction(params, dbManager)
+        .then(updateRequest(req, next));
       break;
     default:
       console.error(`NONE ACTION HAVE MATCHED !`);
