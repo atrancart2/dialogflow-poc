@@ -17,7 +17,8 @@ export const checkAccessKey = async ({ email, accessKey }, dbManager: DbManager)
         const doc = await dbManager.getUserSecure(email, accessKey);
         console.log("Access key valid ! Continuing");
         return {
-            speech: `Merci ! Heureux de vous revoir ${doc.firstname}. TODO : Ask for action`,
+            speech: `Merci ! Heureux de vous revoir ${doc.firstname}.
+            Lors de notre dernière conversation vous m'avez dit vouloir voyager vers ${doc.destination}`,
         };
     } catch (e) {
         console.log("Invalid access key");

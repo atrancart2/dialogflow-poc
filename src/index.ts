@@ -1,5 +1,6 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
+import { searchTrains } from "./api";
 import DbManager from "./db";
 import IChatResponse from "./IChatResponse";
 import Mailer from "./mailer";
@@ -41,6 +42,12 @@ app.post("/", async (req, res, next) => {
     case "ask-password-recovery":
       askPasswordRecovery(params, dbManager, mailer)
         .then(updateRequest(req, next));
+      break;
+    case "search-trains":
+      searchTrains
+        .then(res => {
+
+        })
       break;
     default:
       console.error(`NONE ACTION HAVE MATCHED !`);
