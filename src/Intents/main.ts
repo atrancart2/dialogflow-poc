@@ -94,8 +94,8 @@ export const searchTrainsAction = async (params, dbManager: DbManager): Promise<
     }
     
     speech += `
-    
-    `;
+
+`;
     speech += buildSpeechTrainResults(params, response, true);
   }
   
@@ -176,8 +176,10 @@ const buildSpeechTrainResults = (params, response, isReturn) => {
   const folders = response.data["folders"];
   const departure = isReturn ? moment(params.return_date) : moment(params.departure_date);
   const trip_type = isReturn ? "Retour" : "Aller";
+  const origin = isReturn ? params.destination : params.origin;
+  const destination = isReturn ? params.origin : params.destination;
   //Construction du message de retour
-  var speech = `Trajet ${trip_type} : ${params.origin} -> ${params.destination}, le ${departure.format('dddd Do MMMM YYYY')}`;
+  var speech = `Trajet ${trip_type} : ${origin} -> ${destination}, le ${departure.format('dddd Do MMMM YYYY')}`;
   
   for(var i = 0; i < trips.length; i++)
   {
@@ -197,7 +199,7 @@ const buildSpeechTrainResults = (params, response, isReturn) => {
       var travel_class = segment.travel_class == "economy" ? "2ème classe" : "1ère classe";
     
       speech += `
-        Départ : ${departure_hours}:${departure_minutes} -> Arrivée : ${arrival_hours}:${arrival_minutes} pour ${trip.cents/100}€ en ${travel_class}`;
+        ${departure_hours}:${departure_minutes} -> ${arrival_hours}:${arrival_minutes} pour ${trip.cents/100}€ en ${travel_class}`;
     }
   }
   
