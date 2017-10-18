@@ -2,6 +2,7 @@ import DbManager from "../db";
 import IChatResponse from "../IChatResponse";
 import { searchTrains, searchStations } from "../api";
 import * as moment from 'moment';
+import { Assertion } from "../entities";
 
 /**
  * Handle welcome init event.
@@ -67,8 +68,19 @@ export const welcomeInit = async ({ email, firstname }, dbManager: DbManager): P
 export const searchTrainsAction = async (params, dbManager: DbManager): Promise<IChatResponse> => {
   // Ca ca attends que la promise se résolve et ça met la data dedans
   console.log("=== TRAINS CALL ===");
-  
   moment.locale('fr');
+  
+  let speech;
+
+  if (params["need_return_date"] === Assertion.OUI) {
+    
+    return {
+        followupEvent: {
+            data: { ...params },
+            name: "ask-return-date-event",
+        },
+    };
+  } 
   
   //TRAJET ALLER
   //On construit les paramètres en JSON à envoyer à l'api de recherche de trajet de train
@@ -80,9 +92,9 @@ export const searchTrainsAction = async (params, dbManager: DbManager): Promise<
     console.error("L'appel a foiré");
   }
   
-  var speech = buildSpeechTrainResults(params, response, false);
+  speech = buildSpeechTrainResults(params, response, false);
   
-  if(params.return_date != null){
+  if(params.return_date){
     //TRAJET RETOUR
     //On construit les paramètres en JSON à envoyer à l'api de recherche de trajet de train
     const trainParams = await buildSearchTrainsParams(params, true);
