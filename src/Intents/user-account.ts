@@ -35,7 +35,10 @@ Que puis-je pour vous ?`;
         console.log("Invalid access key");
 
         return {
-            contextOut: [{ name: "Asked-Password-Recovery", lifespan: 1, parameters: { email } }],
+            contextOut: [
+              { name: "Asked-Password-Recovery", lifespan: 1, parameters: { email } },
+              { name: "User-Retrieved-Data", lifespan: 0 },
+            ],
             speech: `Désolé, mais ce n'est pas le bon code. Dois-je vous le renvoyer par e-mail ?`,
         };
     }
