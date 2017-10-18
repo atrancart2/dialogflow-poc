@@ -83,23 +83,36 @@ export const searchTrainsAction = async (params, dbManager: DbManager): Promise<
     };
   } 
   
-  //let doc = await dbManager.patchUser(email, params.accessKey, { "destination": params.destination });
-  //TRAJET ALLER
-  //On construit les paramètres en JSON à envoyer à l'api de recherche de trajet de train
-  const trainParams = await buildSearchTrainsParams(params, false);
-  //envoi de la requête
-  const response = await searchTrains(trainParams);
-  
-  if(!response.ok){
-    console.error("L'appel a foiré");
-  }
-  
-  speech = buildSpeechTrainResults(params, response, false);
+  //On sauvegarde la destination
+  //let doc = await dbManager.patchUser(params.email, params.accessKey, { "destination": params.destination });
   
   if(params.return_date){
-    //TRAJET RETOUR
+    
+    //TRAJET ALLER-RETOUR
     //On construit les paramètres en JSON à envoyer à l'api de recherche de trajet de train
-    const trainParams = await buildSearchTrainsParams(params, true);
+    const trainParamsAller = await buildSearchTrainsParams(params, false);
+    const trainParamsRetour = await buildSearchTrainsParams(params, true);
+    
+    const paramsArray = [ trainParamsAller, trainParamsRetour ];
+    
+    const tripsPromises = paramsArray.map(async trip => {
+      const reponse = await searchTrains(trip);
+      return reponse;
+    })
+    
+    const tripsAller = await tripsPromises[0];
+    const tripsRetour = await tripsPromises[1];
+    
+    speech = buildSpeechTrainResults(params, tripsAller, false);
+    speech += `
+
+`;
+    speech += buildSpeechTrainResults(params, tripsRetour, true);
+    
+  } else {
+    //TRAJET ALLER
+    //On construit les paramètres en JSON à envoyer à l'api de recherche de trajet de train
+    const trainParams = await buildSearchTrainsParams(params, false);
     //envoi de la requête
     const response = await searchTrains(trainParams);
     
@@ -107,10 +120,7 @@ export const searchTrainsAction = async (params, dbManager: DbManager): Promise<
       console.error("L'appel a foiré");
     }
     
-    speech += `
-
-`;
-    speech += buildSpeechTrainResults(params, response, true);
+    speech = buildSpeechTrainResults(params, response, false);
   }
   
   console.log(speech);
@@ -131,7 +141,7 @@ export const searchTrainsAction = async (params, dbManager: DbManager): Promise<
 const getStation = async(params) => {
     const stationResponse = await searchStations({ context:"search", q:params });
     
-    return stationResponse.data["stations"][0];
+    return stationResponse.data["stations"][0]["id"];
 } 
 
 /**
@@ -141,14 +151,21 @@ const getStation = async(params) => {
  */
 const buildSearchTrainsParams = async(params, isReturn) => {
   
-  const origin_station = await getStation(params.origin);
-  const destination_station = await getStation(params.destination);
+  const stationsArray = [ params.origin, params.destination ];
+  
+  const stationPromises = stationsArray.map(async station => {
+    const reponse = await getStation(station);
+    return reponse;
+  })
+  
+  const origin_station_id = await stationPromises[0];
+  const destination_station_id = await stationPromises[1];
 
   var ret = {
       "search": {
       "departure_date": isReturn ? params.return_date : params.departure_date,
-      "departure_station_id": isReturn ? destination_station.id : origin_station.id,
-      "arrival_station_id": isReturn ? origin_station.id : destination_station.id,
+      "departure_station_id": isReturn ? destination_station_id : origin_station_id,
+      "arrival_station_id": isReturn ? origin_station_id : destination_station_id,
       "return_date": null,
       "passengers":[  
              {  

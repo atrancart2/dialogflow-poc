@@ -27,6 +27,9 @@ app.post("/", async (req, res, next) => {
   const action = req.body.result.action;
   const params = req.body.result.parameters;
 
+//  res.setHeader('Content-Type', 'application/json'); 
+//  res.send(JSON.stringify({ "speech": "Processing...", "displayText": "Processing..."  }));
+
   console.log(`=== RECEIVED NEW ACTION : ${action}`);
   // Handle specific job
   switch (action) {

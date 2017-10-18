@@ -16,17 +16,27 @@ export const checkAccessKey = async ({ email, accessKey }, dbManager: DbManager)
         console.log(`=== CHECK KEY : ${accessKey} for email : ${email}`);
         const doc = await dbManager.getUserSecure(email, accessKey);
         console.log("Access key valid ! Continuing");
+        let speech = `Merci ! Heureux de vous revoir ${doc.firstname}`;
+        
+        if(doc.destination)
+        {
+          speech += `
+Lors de notre dernière conversation vous m'aviez dit vouloir voyager vers ${doc.destination}`;
+        }
+        
+        speech += `
+Que puis-je pour vous ?`;        
+        
         return {
             contextOut: [{ name: "User-Retrieved-Data", lifespan: 10, parameters: { doc } }],
-            speech: `Merci ! Heureux de vous revoir ${doc.firstname}.
-            Lors de notre dernière conversation vous m'avez dit vouloir voyager vers ${doc.destination}`,
+            speech
         };
     } catch (e) {
         console.log("Invalid access key");
 
         return {
             contextOut: [{ name: "Asked-Password-Recovery", lifespan: 1, parameters: { email } }],
-            speech: `Désolé, j'ai mais ce n'est pas le bon code. Dois-je vous le renvoyer par e-mail ?`,
+            speech: `Désolé, mais ce n'est pas le bon code. Dois-je vous le renvoyer par e-mail ?`,
         };
     }
 };
