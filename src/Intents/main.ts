@@ -83,6 +83,7 @@ export const searchTrainsAction = async (params, dbManager: DbManager): Promise<
     };
   } 
   
+  //let doc = await dbManager.patchUser(email, params.accessKey, { "destination": params.destination });
   //TRAJET ALLER
   //On construit les paramètres en JSON à envoyer à l'api de recherche de trajet de train
   const trainParams = await buildSearchTrainsParams(params, false);
@@ -115,6 +116,7 @@ export const searchTrainsAction = async (params, dbManager: DbManager): Promise<
   console.log(speech);
   
   return {
+    contextOut: [{ name: "Trip-Result-Context", lifespan: 1 }],
     speech: speech
   }
   
