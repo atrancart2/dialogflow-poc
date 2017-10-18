@@ -65,7 +65,7 @@ export const welcomeInit = async ({ email, firstname }, dbManager: DbManager): P
  *
  * @param {object} params - The request params
  */
-export const searchTrainsAction = async (params, dbManager: DbManager): Promise<IChatResponse> => {
+export const searchTrainsAction = async (params, dbManager: DbManager, contexts): Promise<IChatResponse> => {
   // Ca ca attends que la promise se résolve et ça met la data dedans
   console.log("=== TRAINS CALL ===");
   moment.locale('fr');
@@ -84,7 +84,11 @@ export const searchTrainsAction = async (params, dbManager: DbManager): Promise<
   } 
   
   //On sauvegarde la destination
-  //let doc = await dbManager.patchUser(params.email, params.accessKey, { "destination": params.destination });
+  const userContext = contexts.find((context) => context.name === "user-retrieved-data" );
+  if(userContext)
+  {
+      let doc = await dbManager.patchUser(userContext.parameters.doc.email, userContext.parameters.doc.accessKey, { "destination": params.destination, "origin": params.origin });
+  }
   
   if(params.return_date){
     

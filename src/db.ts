@@ -28,6 +28,7 @@ export default class DbManager {
       _id: `user_${email}`,
       accessKey: this.generateAccessKey(),
       type: TYPE_USER,
+      email
     });
   }
 

@@ -26,6 +26,7 @@ const mailer = new Mailer();
 app.post("/", async (req, res, next) => {
   const action = req.body.result.action;
   const params = req.body.result.parameters;
+  const contexts = req.body.result.contexts;
 
 //  res.setHeader('Content-Type', 'application/json'); 
 //  res.send(JSON.stringify({ "speech": "Processing...", "displayText": "Processing..."  }));
@@ -46,7 +47,7 @@ app.post("/", async (req, res, next) => {
         .then(updateRequest(req, next));
       break;
     case "search-trains":
-      searchTrainsAction(params, dbManager)
+      searchTrainsAction(params, dbManager, contexts)
         .then(updateRequest(req, next));
       break;
     default:
