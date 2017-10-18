@@ -71,6 +71,7 @@ export const searchTrainsAction = async (params, dbManager: DbManager): Promise<
   moment.locale('fr');
   
   let speech;
+  console.log("Need return date : "+params["need_return_date"]);
 
   if (params["need_return_date"] === Assertion.OUI) {
     
